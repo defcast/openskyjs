@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/francoiscote/openskyjs#readme",
   "dependencies": {
-    "debug": "^2.6.8"
+    "debug": "^2.6.8",
+    "request": "^2.81.0"
   },
   "devDependencies": {
     "eslint": "^4.3.0",
