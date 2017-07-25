@@ -2,7 +2,7 @@
   "name": "openskyjs",
   "version": "0.0.1",
   "description": "OpenSky Network API Client",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +19,15 @@
   "bugs": {
     "url": "https://github.com/francoiscote/openskyjs/issues"
   },
-  "homepage": "https://github.com/francoiscote/openskyjs#readme"
+  "homepage": "https://github.com/francoiscote/openskyjs#readme",
+  "dependencies": {
+    "debug": "^2.6.8"
+  },
+  "devDependencies": {
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.1.0"
+  }
 }
