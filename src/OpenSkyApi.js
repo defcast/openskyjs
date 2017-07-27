@@ -1,57 +1,112 @@
-// TODO: Logger
-// TODO: jsDoc
 // TODO: OpenSkyAPI Class
-  // TODO: Auth manager
-  // TODO: Rate Limiting
-  // TODO: getStates
-  // TODO: getMyStates
-// TODO: OpenSkyStates Class
-// TODO: StateVector Class
+//    TODO: return OpenSkyStates instead of raw json.
 // TODO: Unit Tests
+// TODO: cleanup the logs
+// TODO: jsDoc
+// TODO: prepare and publish the npm package
 
 
-const debug = require('debug')('openskyjs');
+const debug = require('debug')('OpenSkyApi');
 const request = require('request');
 
 let openSkyClient = null;
 
 class OpenSkyApi {
   constructor(username = null, password = null) {
-    this.last_request = null;
-
-    // Request Defaults
-    openSkyClient = request.defaults({
-      baseUrl: 'https://opensky-network.org/api',
-      json: true,
-    });
+    this.last_request = [];
+    this.auth = '';
 
     // Auth
     if (username && password) {
-      openSkyClient.auth(username, password);
+      this.auth = `${username}:${password}@`;
     }
+
+    // Request Defaults
+    openSkyClient = request.defaults({
+      baseUrl: `https://${this.auth}opensky-network.org/api`,
+      json: true,
+    });
   }
 
-  getJson(endpoint, callee, params) {
+  getJson(endpoint, params, callee) {
     let error;
 
-    const req = openSkyClient.get(endpoint, (err, res, body) => {
+    if (!callee) {
+      throw new Error('Missing callee parameter');
+    }
 
-      if (err) {
-        error = new Error(`Request Failed.\n Error: ${err}`);
-        debug(error.message);
-        return;
-      }
+    const options = {
+      uri: endpoint,
+      qs: params,
+    };
 
-      if (res.statusCode !== 200) {
-        error = new Error(`Request Failed.\n Status Code: ${res.statusCode}`);
-        debug(error.message);
-        return;
-      }
+    this.last_request[callee] = Math.floor(Date.now() / 1000);
 
-      this.last_request = body.time;
+    return new Promise((resolve, reject) => {
+      openSkyClient.get(options, (err, res, body) => {
+        if (err) {
+          error = new Error(`Request Failed.\n${err}`);
+          debug(error.message);
+          reject(error);
+        }
 
-      debug(body.time, body.states.length);
+        if (res.statusCode !== 200) {
+          error = new Error(`Request Failed.\nStatus Code: ${res.statusCode}`);
+          debug(error.message);
+          reject(error);
+        }
+
+        resolve(body);
+      });
     });
+  }
+
+  checkRateLimit(limitAuth, limitNoAuth, callee) {
+    const now = Math.floor(Date.now() / 1000);
+
+    debug(this.last_request);
+
+    if (!this.last_request[callee]) {
+      return true;
+    }
+
+    if (this.auth) {
+      return Math.abs(now - this.last_request[callee]) >= limitAuth;
+    }
+
+    return Math.abs(now - this.last_request[callee]) >= limitNoAuth;
+  }
+
+  getStates(time, icao24) {
+    let error;
+    const callee = 'getStates';
+
+    if (!this.checkRateLimit(5, 10, callee)) {
+      error = new Error('Blocking request. Could not process request because of rate limit');
+      debug(error.message);
+      return Promise.reject(error);
+    }
+
+    return this.getJson('/states/all', { time, icao24 }, callee);
+  }
+
+  getOwnStates(time, icao24, serials) {
+    let error;
+    const callee = 'getOwnStates';
+
+    if (!this.auth) {
+      error = new Error('Blocking request. You need to be authorized to fetch your own states.');
+      debug(error.message);
+      return Promise.reject(error);
+    }
+
+    if (!this.checkRateLimit(0, 1, callee)) {
+      error = new Error('Blocking request. Could not process request because of rate limit.');
+      debug(error.message);
+      return Promise.reject(error);
+    }
+
+    return this.getJson('/states/own', { time, icao24, serials }, callee);
   }
 }
 
