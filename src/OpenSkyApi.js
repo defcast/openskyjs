@@ -8,6 +8,7 @@
 
 const debug = require('debug')('OpenSkyApi');
 const request = require('request');
+const OpenSkyStates = require('./OpenSkyStates');
 
 let openSkyClient = null;
 
@@ -87,7 +88,8 @@ class OpenSkyApi {
       return Promise.reject(error);
     }
 
-    return this.getJson('/states/all', { time, icao24 }, callee);
+    return this.getJson('/states/all', { time, icao24 }, callee)
+      .then(allStates => new OpenSkyStates(allStates));
   }
 
   getOwnStates(time, icao24, serials) {
@@ -106,7 +108,8 @@ class OpenSkyApi {
       return Promise.reject(error);
     }
 
-    return this.getJson('/states/own', { time, icao24, serials }, callee);
+    return this.getJson('/states/own', { time, icao24, serials }, callee)
+      .then(ownStates => new OpenSkyStates(ownStates));
   }
 }
 

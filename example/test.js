@@ -1,19 +1,12 @@
 const OpenSkyApi = require('../src/OpenSkyApi');
-const OpenSkyStates = require('../src/OpenSkyStates');
-const StateVector = require('../src/StateVector');
-
 const debug = require('debug')('opensky-client');
 
 const osClient = new OpenSkyApi();
 
-osClient.getStates()
+osClient.getStates(1501246020)
   .then((myStates) => {
-    const myOpenSkyStates = new OpenSkyStates(myStates);
-    debug(myOpenSkyStates.states);
+    debug(myStates);
   })
   .catch((error) => {
     debug(error);
   });
-
-// const plane = new StateVector(planeData);
-// debug(plane);
