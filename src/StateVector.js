@@ -17,6 +17,8 @@ const keys = [
 
 class StateVector {
   constructor(data) {
+    if (!data) return;
+
     keys.forEach((key, i) => {
       Object.defineProperty(this, key, { value: data[i], enumerable: true });
     });

@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "DEBUG=opensky nodemon example/test.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -26,11 +26,13 @@
     "request": "^2.81.0"
   },
   "devDependencies": {
+    "chai": "^4.1.0",
     "eslint": "^4.3.0",
     "eslint-config-airbnb": "^15.1.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
+    "mocha": "^3.4.2",
     "nodemon": "^1.11.0"
   }
 }
