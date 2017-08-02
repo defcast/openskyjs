@@ -17,7 +17,11 @@ const keys = [
 
 class StateVector {
   constructor(data) {
-    if (!data) return;
+    if (!data) throw Error('StateVector: no data provided');
+
+    if (!Array.isArray(data)) throw Error('StateVector: data must be an array of values.');
+
+    if (data.length < keys.length) throw Error('StateVector: Data length does not match the keys length');
 
     keys.forEach((key, i) => {
       Object.defineProperty(this, key, { value: data[i], enumerable: true });
