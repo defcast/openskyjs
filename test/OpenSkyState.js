@@ -2,6 +2,8 @@
 
 const expect = require('chai').expect;
 const OpenSkyStates = require('../src/OpenSkyStates');
+const StateVector = require('../src/StateVector');
+const dataGoodAllStates = require('./mockData/good_allStates');
 
 describe('#OpenSkyStates', function () {
   describe('when passed bad data', function () {
@@ -25,8 +27,25 @@ describe('#OpenSkyStates', function () {
   });
 
   describe('when passed good data', function () {
-    it('should return an OpenSkyStates instance');
-    it('the instance should return a time property');
-    it('the instance should return a states property, which is an array of StateVectors');
+    let inst = null;
+
+    before(function () {
+      inst = new OpenSkyStates(dataGoodAllStates);
+    });
+
+    it('should return an OpenSkyStates instance', function () {
+      expect(inst).to.be.an.instanceOf(OpenSkyStates);
+    });
+
+    it('the instance should return a time property', function () {
+      expect(inst).to.have.property('time', 1501935200);
+    });
+
+    it('the instance should return a states property, which is an array of StateVectors', function () {
+      expect(inst).to.have.property('states').that.is.an('Array');
+      inst.states.forEach(function (states) {
+        expect(states).to.be.an.instanceOf(StateVector);
+      });
+    });
   });
 });
