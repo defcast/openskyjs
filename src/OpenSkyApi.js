@@ -1,16 +1,17 @@
-// TODO: OpenSkyAPI Class
-//    TODO: return OpenSkyStates instead of raw json.
-// TODO: Unit Tests
 // TODO: cleanup the logs
 // TODO: jsDoc
 // TODO: prepare and publish the npm package
 
 
 const debug = require('debug')('OpenSkyApi');
+const config = require('config');
 const request = require('request');
 const OpenSkyStates = require('./OpenSkyStates');
 
+const osConfig = config.get('openSkyNetwork');
+
 let openSkyClient = null;
+
 
 class OpenSkyApi {
   constructor(username = null, password = null) {
@@ -24,24 +25,32 @@ class OpenSkyApi {
 
     // Request Defaults
     openSkyClient = request.defaults({
-      baseUrl: `https://${this.auth}opensky-network.org/api`,
+      baseUrl: `${osConfig.protocol}://${this.auth}${osConfig.hostname}`,
       json: true,
     });
   }
 
-  getJson(endpoint, params, callee) {
+  tryGet(endpoint, params) {
     let error;
 
-    if (!callee) {
-      throw new Error('Missing callee parameter');
+    if (!this.checkRateLimit(endpoint)) {
+      error = new Error('Blocking request. Could not process request because of rate limit');
+      debug(error.message);
+      return Promise.reject(error);
     }
+
+    this.last_request[endpoint] = Math.floor(Date.now() / 1000);
+
+    return OpenSkyApi.getJson(endpoint, params);
+  }
+
+  static getJson(endpoint, params) {
+    let error;
 
     const options = {
       uri: endpoint,
       qs: params,
     };
-
-    this.last_request[callee] = Math.floor(Date.now() / 1000);
 
     return new Promise((resolve, reject) => {
       openSkyClient.get(options, (err, res, body) => {
@@ -62,39 +71,27 @@ class OpenSkyApi {
     });
   }
 
-  checkRateLimit(limitAuth, limitNoAuth, callee) {
+  checkRateLimit(endpoint) {
     const now = Math.floor(Date.now() / 1000);
 
-    debug(this.last_request);
-
-    if (!this.last_request[callee]) {
+    if (!this.last_request[endpoint]) {
       return true;
     }
 
     if (this.auth) {
-      return Math.abs(now - this.last_request[callee]) >= limitAuth;
+      return Math.abs(now - this.last_request[endpoint]) >= osConfig.rateLimits[endpoint].auth;
     }
 
-    return Math.abs(now - this.last_request[callee]) >= limitNoAuth;
+    return Math.abs(now - this.last_request[endpoint]) >= osConfig.rateLimits[endpoint].noAuth;
   }
 
-  getStates(time, icao24) {
-    let error;
-    const callee = 'getStates';
-
-    if (!this.checkRateLimit(5, 10, callee)) {
-      error = new Error('Blocking request. Could not process request because of rate limit');
-      debug(error.message);
-      return Promise.reject(error);
-    }
-
-    return this.getJson('/states/all', { time, icao24 }, callee)
+  getStates(params) {
+    return this.tryGet('/states/all', params, 'getStates')
       .then(allStates => new OpenSkyStates(allStates));
   }
 
-  getOwnStates(time, icao24, serials) {
+  getOwnStates(params) {
     let error;
-    const callee = 'getOwnStates';
 
     if (!this.auth) {
       error = new Error('Blocking request. You need to be authorized to fetch your own states.');
@@ -102,13 +99,7 @@ class OpenSkyApi {
       return Promise.reject(error);
     }
 
-    if (!this.checkRateLimit(0, 1, callee)) {
-      error = new Error('Blocking request. Could not process request because of rate limit.');
-      debug(error.message);
-      return Promise.reject(error);
-    }
-
-    return this.getJson('/states/own', { time, icao24, serials }, callee)
+    return this.tryGet('/states/own', params, 'getOwnStates')
       .then(ownStates => new OpenSkyStates(ownStates));
   }
 }
