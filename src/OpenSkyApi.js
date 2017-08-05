@@ -10,9 +10,6 @@ const OpenSkyStates = require('./OpenSkyStates');
 
 const osConfig = config.get('openSkyNetwork');
 
-let openSkyClient = null;
-
-
 class OpenSkyApi {
   constructor(username = null, password = null) {
     this.last_request = [];
@@ -24,7 +21,7 @@ class OpenSkyApi {
     }
 
     // Request Defaults
-    openSkyClient = request.defaults({
+    this.openSkyClient = request.defaults({
       baseUrl: `${osConfig.protocol}://${this.auth}${osConfig.hostname}`,
       json: true,
     });
@@ -41,10 +38,10 @@ class OpenSkyApi {
 
     this.last_request[endpoint] = Math.floor(Date.now() / 1000);
 
-    return OpenSkyApi.getJson(endpoint, params);
+    return this.getJson(endpoint, params);
   }
 
-  static getJson(endpoint, params) {
+  getJson(endpoint, params) {
     let error;
 
     const options = {
@@ -53,7 +50,7 @@ class OpenSkyApi {
     };
 
     return new Promise((resolve, reject) => {
-      openSkyClient.get(options, (err, res, body) => {
+      this.openSkyClient.get(options, (err, res, body) => {
         if (err) {
           error = new Error(`Request Failed.\n${err}`);
           debug(error.message);
