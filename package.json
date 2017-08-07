@@ -2,9 +2,11 @@
   "name": "openskyjs",
   "version": "1.0.0",
   "description": "OpenSky Network API Client",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "babel src -d dist",
     "dev": "DEBUG=opensky nodemon example/test.js",
+    "prepublish": "npm run build",
     "test": "mocha"
   },
   "repository": {
@@ -27,6 +29,8 @@
     "request": "^2.81.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
     "chai": "^4.1.0",
     "eslint": "^4.3.0",
     "eslint-config-airbnb": "^15.1.0",

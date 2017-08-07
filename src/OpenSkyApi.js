@@ -1,6 +1,5 @@
 // TODO: cleanup the logs
 // TODO: jsDoc
-// TODO: prepare and publish the npm package
 
 
 const debug = require('debug')('OpenSkyApi');
