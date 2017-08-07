@@ -1,18 +1,15 @@
-/* eslint-env mocha */
+import StateVector from '../src/StateVector';
 
-const expect = require('chai').expect;
-const StateVector = require('../src/StateVector');
-
-describe('#StateVector', function () {
-  describe('when passed no data', function () {
-    it('throws an error', function () {
+describe('#StateVector', () => {
+  describe('when passed no data', () => {
+    test('throws an error', () => {
       function mySVThrow() { new StateVector(); }
-      expect(mySVThrow).to.throw(Error);
+      expect(mySVThrow).toThrow(Error);
     });
   });
 
-  describe('when passed bad data', function () {
-    it('when it receives less data than expected, it should throw an error', function () {
+  describe('when passed bad data', () => {
+    test('when it receives less data than expected, it should throw an error', () => {
       const littleData = [
         '3c6444',
         'DLH9LF  ',
@@ -29,17 +26,17 @@ describe('#StateVector', function () {
       ];
 
       function mySVThrow() { new StateVector(littleData); }
-      expect(mySVThrow).to.throw(Error);
+      expect(mySVThrow).toThrow(Error);
     });
 
-    it('when it receives data that is not an array, it should throw an error', function () {
+    test('when it receives data that is not an array, it should throw an error', () => {
       function mySVThrow() { new StateVector({ hello: true }); }
-      expect(mySVThrow).to.throw(Error);
+      expect(mySVThrow).toThrow(Error);
     });
   });
 
-  describe('when everything is fine', function () {
-    it('should return a StateVector instance, with the expected properties', function () {
+  describe('when everything is fine', () => {
+    test('should return a StateVector instance, with the expected properties', () => {
       const goodAPIData = [
         '3c6444',
         'DLH9LF  ',
@@ -82,8 +79,8 @@ describe('#StateVector', function () {
 
       const myGoodSV = new StateVector(goodAPIData);
 
-      expect(myGoodSV).to.be.an.instanceOf(StateVector);
-      expect(myGoodSV).to.deep.equal(goodStateVectorProps);
+      expect(myGoodSV).toBeInstanceOf(StateVector);
+      expect(myGoodSV).toEqual(goodStateVectorProps);
     });
   });
 });
