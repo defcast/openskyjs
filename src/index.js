@@ -1,3 +1,3 @@
-const OpenSkyApi = require("./OpenSkyApi");
+import OpenSkyApi from './OpenSkyApi';
 
-export default OpenSkyApi;
+module.exports = OpenSkyApi;

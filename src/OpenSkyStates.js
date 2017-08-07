@@ -1,4 +1,4 @@
-const StateVector = require('./StateVector');
+import StateVector from './StateVector';
 
 class OpenSkyStates {
   constructor(data) {

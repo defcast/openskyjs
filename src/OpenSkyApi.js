@@ -2,11 +2,12 @@
 // TODO: jsDoc
 
 
-const debug = require('debug')('OpenSkyApi');
-const config = require('config');
-const request = require('request');
-const OpenSkyStates = require('./OpenSkyStates');
+import debugTool from 'debug';
+import config from 'config';
+import request from 'request';
+import OpenSkyStates from './OpenSkyStates';
 
+const debug = debugTool('OpenSkyApi');
 const osConfig = config.get('openSkyNetwork');
 
 class OpenSkyApi {

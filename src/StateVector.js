@@ -1,4 +1,3 @@
-
 const keys = [
   'icao24',
   'callsign',
