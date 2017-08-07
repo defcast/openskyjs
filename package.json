@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "OpenSky Network API Client",
   "main": "dist/index.js",
+  "files" : [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=4.0"
+  },
   "scripts": {
     "build": "babel src -d dist",
     "dev": "DEBUG=opensky nodemon example/test.js",
@@ -17,7 +23,7 @@
     "opensky",
     "ads-b"
   ],
-  "author": "François Côté",
+  "author": "François Côté <francois@francoiscote.net> (http://www.francoiscote.net)",
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/francoiscote/openskyjs/issues"
